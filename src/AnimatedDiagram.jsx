@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { p } from 'framer-motion/client';
 
 const Arrow = ({ x1, y1, x2, y2, label }) => {
   const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
@@ -36,12 +37,13 @@ const Arrow = ({ x1, y1, x2, y2, label }) => {
         y2={y2}
         stroke="#0ea5e9"
         strokeWidth="6"
-        strokeDasharray="6"
-        strokeDashoffset="6"
+        strokeDasharray="12" // más largo = más notorio
+        initial={{ strokeDashoffset: 12 }}
         animate={{ strokeDashoffset: 0 }}
-        transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+        transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
         markerEnd="url(#arrowhead)"
       />
+
     </>
   );
 };
@@ -51,16 +53,42 @@ const ImageNode = ({ x, y, label, imgUrl, bgColor = '#1e40af', glowId = 'glow-bl
     animate={{ scale: [1, 1.05, 1] }}
     transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
   >
-    <motion.rect
+    {/* Rectángulo de fondo con glow */}
+    <rect
       x={x - 100}
       y={y - 100}
       width="200"
       height="200"
       rx="25"
       fill={bgColor}
-      filter={`url(#${glowId})`} // <- personalizado por nodo
+      filter={`url(#${glowId})`}
     />
+
+    {/* Borde punteado animado con el mismo color que el fondo */}
+    <motion.rect
+      x={x - 100}
+      y={y - 100}
+      width="200"
+      height="200"
+      rx="25"
+      fill="none"
+      stroke={bgColor} // mismo color que el nodo
+      strokeWidth="3"
+      strokeDasharray="12 6"
+      strokeLinecap="round"
+      animate={{ strokeDashoffset: [0, 72] }}
+      transition={{
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 1.5,
+        ease: "linear"
+      }}
+    />
+
+    {/* Imagen del nodo */}
     <image href={imgUrl} x={x - 55} y={y - 55} width="110" height="110" />
+
+    {/* Texto debajo */}
     <text
       x={x}
       y={y + 90}
@@ -74,134 +102,76 @@ const ImageNode = ({ x, y, label, imgUrl, bgColor = '#1e40af', glowId = 'glow-bl
   </motion.g>
 );
 
-
 export default function AnimatedDiagram() {
   return (
-    <svg viewBox="0 0 1900 900" className="w-full h-auto">
-      {/* Arrowhead marker */}
+    <svg viewBox="0 0 2400 1000" className="w-full h-auto">
       <defs>
         <marker
           id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="8"
-          refY="3.5"
+          markerWidth="6"
+          markerHeight="6"
+          refX="5"
+          refY="3"
           orient="auto"
         >
-          <polygon points="0 0, 10 3.5, 0 7" fill="#0ea5e9" />
+          <polygon points="0 0, 6 3, 0 6" fill="#0ea5e9" />
         </marker>
 
-       {/* Brillo suave para nodos */}
-<defs>
-  <marker
-    id="arrowhead"
-    markerWidth="10"
-    markerHeight="7"
-    refX="8"
-    refY="3.5"
-    orient="auto"
-  >
-    <polygon points="0 0, 10 3.5, 0 7" fill="#0ea5e9" />
-  </marker>
-
-  {/* Glow filters personalizados */}
-  <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#1e3a8a" floodOpacity="1" />
-  </filter>
-  <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#075985" floodOpacity="1" />
-  </filter>
-  <filter id="glow-yellow" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#a16207" floodOpacity="1" />
-  </filter>
-  <filter id="glow-purple" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#6b21a8" floodOpacity="1" />
-  </filter>
-  <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#166534" floodOpacity="1" />
-  </filter>
-  <filter id="glow-red" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#dc2626" floodOpacity="1" />
-  </filter>
-  <filter id="glow-lime" x="-50%" y="-50%" width="200%" height="200%">
-    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#16a34a" floodOpacity="1" />
-  </filter>
-</defs>
-
+        {/* Filtros para el resplandor */}
+        <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="50" floodColor="#1e3a8a" floodOpacity="1" />
+        </filter>
+        <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="50" floodColor="#075985" floodOpacity="1" />
+        </filter>
+        <filter id="glow-yellow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="50" floodColor="#a16207" floodOpacity="1" />
+        </filter>
+        <filter id="glow-purple" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="50" floodColor="#6b21a8" floodOpacity="1" />
+        </filter>
+        <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="10" floodColor="#166534" floodOpacity="1" />
+        </filter>
+        <filter id="glow-red" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="10" floodColor="#dc2626" floodOpacity="1" />
+        </filter>
+        <filter id="glow-lime" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="10" floodColor="#16a34a" floodOpacity="1" />
+        </filter>
       </defs>
 
-      {/* Nodos principales */}
-      <ImageNode
-        x={100}
-        y={300}
-        label="Web Service Telenanu"
-        imgUrl="https://symbols.getvecta.com/stencil_28/5_app-service-web-app.dbdab14e4a.svg"
-        bgColor="#1e3a8a"
-        glowId="glow-blue"
-      />
+      {/* Nodos principales espaciados */}
+      <ImageNode x={200} y={300} label="Web Service" imgUrl="https://symbols.getvecta.com/stencil_28/5_app-service-web-app.dbdab14e4a.svg" bgColor="#1e3a8a" glowId="glow-blue" />
+      <ImageNode x={500} y={300} label="Orchestrator" imgUrl="https://businessmodelnavigator.com/img/navigator-pattern-img-2/34.png" bgColor="#075985" glowId="glow-cyan" />
+      <ImageNode x={1200} y={160} label="Search Telenanu" imgUrl="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f50d.svg" bgColor="#a16207" glowId="glow-yellow" />
+      <ImageNode x={1200} y={480} label="OpenAI Telenanu" imgUrl="https://cdn-icons-png.flaticon.com/512/4712/4712104.png" bgColor="#6b21a8" glowId="glow-purple" />
 
-      <ImageNode
-        x={350}
-        y={300}
-        label="Orchestrator"
-        imgUrl="https://businessmodelnavigator.com/img/navigator-pattern-img-2/34.png"
-        bgColor="#075985"
-        glowId="glow-cyan"
-      />
+      {/* Fuentes de datos */}
+      <ImageNode x={1700} y={150} label="Documentos" imgUrl="https://cdn-icons-png.flaticon.com/512/337/337946.png" bgColor="#166534" glowId="glow-green" />
+      <ImageNode x={1700} y={360} label="BlobStorage Telenanu" imgUrl="https://www.devopsschool.com/blog/wp-content/uploads/2023/08/image-684.png" bgColor="#dc2626" glowId="glow-red" />
+      <ImageNode x={1700} y={570} label="TelenanuDB" imgUrl="https://us.123rf.com/450wm/binaryproject/binaryproject1510/binaryproject151000009/46790412-cloud-database-connecting-laptop-smartphone-and-tab-vector-flat.jpg" bgColor="#16a34a" glowId="glow-lime" />
 
-      <ImageNode
-        x={950}
-        y={160}
-        label="Search Telenanu"
-        imgUrl="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f50d.svg"
-        bgColor="#a16207"
-        glowId="glow-yellow"
-      />
+      {/* Flechas animadas corregidas */}
+      <Arrow x1={300} y1={300} x2={400} y2={300} />
+      <Arrow x1={600} y1={300} x2={1100} y2={190} label="Query knowledge" />
+      <Arrow x1={1100} y1={190} x2={600} y2={300} />
+      <Arrow x1={1620} y1={150} x2={1300} y2={160} />
+      <Arrow x1={1620} y1={360} x2={1300} y2={160} />
+      <Arrow x1={1620} y1={570} x2={1300} y2={160} />
+      <Arrow x1={600} y1={300} x2={1100} y2={450} label="prompt+knowledge (Response)" />
+      <Arrow x1={1100} y1={450} x2={600} y2={300} />
 
-      <ImageNode
-        x={950}
-        y={480}
-        label="OpenAI Telenanu"
-        imgUrl="https://cdn-icons-png.flaticon.com/512/4712/4712104.png"
-        bgColor="#6b21a8"
-        glowId="glow-purple"
-      />
-
-      {/* Fuentes de datos en columna */}
-      <ImageNode
-        x={1350}
-        y={150}
-        label="Documentos"
-        imgUrl="https://cdn-icons-png.flaticon.com/512/337/337946.png"
-        bgColor="#166534"
-        glowId="glow-green"
-      />
-      <ImageNode
-        x={1350}
-        y={360}
-        label="BlobStorage Telenanu"
-        imgUrl="https://www.devopsschool.com/blog/wp-content/uploads/2023/08/image-684.png"
-        bgColor="#dc2626"
-        glowId="glow-red"
-      />
-      <ImageNode
-        x={1350}
-        y={570}
-        label="TelenanuDB"
-        imgUrl="https://us.123rf.com/450wm/binaryproject/binaryproject1510/binaryproject151000009/46790412-cloud-database-connecting-laptop-smartphone-and-tab-vector-flat.jpg"
-        bgColor="#16a34a"
-        glowId="glow-lime"
-      />
-
-      {/* Flechas animadas con etiquetas */}
-      <Arrow x1={185} y1={300} x2={265} y2={300} />
-      <Arrow x1={435} y1={300} x2={900} y2={190} label="Query knowledge" />
-      <Arrow x1={900} y1={190} x2={435} y2={300} />
-      <Arrow x1={1270} y1={150} x2={980} y2={160} />
-      <Arrow x1={1270} y1={360} x2={980} y2={160} />
-      <Arrow x1={1270} y1={570} x2={980} y2={160} />
-      <Arrow x1={435} y1={300} x2={900} y2={450} label="prompt+knowledge (Response)" />
-      <Arrow x1={900} y1={450} x2={435} y2={300} />
+      <text
+        x="20%"
+        y="98%"
+        textAnchor="end"
+        fontSize="36"
+        fill="Negro"
+        fontFamily="Arial, sans-serif"
+      >
+        © Moises Granados - LABSTI 
+      </text>
     </svg>
   );
 }
